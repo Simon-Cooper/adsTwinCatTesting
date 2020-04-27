@@ -33,6 +33,9 @@ def waitForDone(axisNum, timeout=10):
     else:
         print("Done")
 
+def readAxisPosition(axisNum):
+    return plc.read_by_name(f"GVL.astAxes[{axisNum}].stStatus.fActPosition",pyads.PLCTYPE_LREAL)
+
 import pyads
 import time
 # add remote route
@@ -41,8 +44,10 @@ plc.open()
 axisOn(1)
 moveAbsolute(1,2,2)
 waitForDone(1)
+print('Current position: {:.3f}'.format(readAxisPosition(1)))
 time.sleep(0.5)
 moveAbsolute(1,0,2)
 waitForDone(1)
+print('Current position: {:.3f}'.format(readAxisPosition(1)))
 plc.close()
 

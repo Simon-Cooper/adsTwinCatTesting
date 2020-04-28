@@ -1,10 +1,13 @@
 
-def absolutePositionTest(plc,axisNum,targetPosition,velocity,threshold,timeout=10):
-    mf.moveAbsolute(plc,axisNum,targetPosition,velocity)
-    if mf.waitForDone(plc,axisNum,timeout) == False:
+AMS_NET_ID = '5.65.74.200.1.1'
+PLC_PORT = 852
+
+def absolutePositionTest(targetPosition,velocity,threshold,timeout=10):
+    axis1.moveAbsolute(targetPosition,velocity)
+    if axis1.waitForDone(timeout) == False:
         print("Timeout on absolute move")
         return False
-    actualPosition = mf.readAxisPosition(plc,axisNum)
+    actualPosition = axis1.readAxisPosition()
     posDeviation = abs(targetPosition - actualPosition)
     print('Target position: {:.3f}'.format(targetPosition))
     print('Position reached: {:.3f}'.format(actualPosition))
@@ -26,20 +29,22 @@ import time
 import plcMotionFunctions as mf
 from os import system, name
 # add remote route
+
 system('cls')
-plc = pyads.Connection('5.65.74.200.1.1',852) #852 is the port of the PLC, first value is AMS net ID
-plc.open()
-mf.axisOn(plc, 1)
+plc = pyads.Connection(AMS_NET_ID, PLC_PORT) #Setup PLC connection
+plc.open() #Open PLC connection
+axis1 = mf.testClass(plc,1) #Setup testclass with current PLC
+axis1.axisOn()
 #need to actually wait for the axis to turn on, it's a bit slow
 time.sleep(1)
 
 positionTargetsList = [2,0,1,2,1,2,0,3,0]
 
 for i in positionTargetsList:
-    absolutePositionTest(plc,1,i,2,0.005)
+    absolutePositionTest(i,2,0.005)
     time.sleep(1)
 
-mf.axisOff(plc, 1)
+axis1.axisOff()
 
 plc.close()
 

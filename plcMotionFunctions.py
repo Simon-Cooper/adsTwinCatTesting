@@ -10,6 +10,25 @@ class testClass:
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.bEnable",True, pyads.PLCTYPE_BOOL)
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stConfig.fOverride",100, pyads.PLCTYPE_LREAL)
 
+    def waitForOn(self, timeout=10):
+        timeLimit = time.time()+timeout
+        boolTimeoutError = False;
+        while(True):
+            if(self.checkAxisOn()):
+                break
+            if time.time()>timeLimit:
+                boolTimeoutError = True
+                break
+        if boolTimeoutError:
+            print("Timeout: Axis " +axisNum+ " not enabled")
+            return False
+        else:
+            print("Done")
+            return True
+
+    def checkAxisOn(self):
+        return self.plc.read_by_name(f"GVL.astAxes[{self.axisNum}].stStatus.bEnabled",pyads.PLCTYPE_BOOL)
+
     def axisOff(self):
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.bEnable",False, pyads.PLCTYPE_BOOL)
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stConfig.fOverride",0, pyads.PLCTYPE_LREAL)
@@ -18,8 +37,8 @@ class testClass:
         print('Move absolute on Axis {} to position {:.2f} @ velocity {:.2f}'.format(self.axisNum,position,velocity))
         #print(f"Move absolute on Axis {axisNum} to position {position} @ velocity {velocity}")
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.eCommand",0, pyads.PLCTYPE_INT)
-        self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stConfig.fVelocity",velocity, pyads.PLCTYPE_LREAL)
-        self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stConfig.fPosition",position, pyads.PLCTYPE_LREAL)
+        self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.fVelocity",velocity, pyads.PLCTYPE_LREAL)
+        self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.fPosition",position, pyads.PLCTYPE_LREAL)
         self.plc.write_by_name(f"GVL.astAxes[{self.axisNum}].stControl.bExecute",True, pyads.PLCTYPE_BOOL)
 
     def waitForDone(self, timeout=10):
@@ -36,7 +55,7 @@ class testClass:
                 break
             if time.time()>timeLimit:
                 boolTimeoutError = True
-                break   
+                break
         if boolTimeoutError:
             print("Timeout error")
             return False

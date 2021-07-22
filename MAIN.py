@@ -29,14 +29,11 @@ if testAxis.waitForOn() == False:
     input()
     system.exit()
 
-#axis1.axisOn()
-#while True:
-#    print("Position to move to")
-#    pos = input()
-#    if pos == "n":
-#        break
-#    testAxis.moveAbsolute(float(pos),20)
-#    if testAxis.waitForDone() == False:
-#        break
-pointMoves(testAxis,20)
+
+#pointMoves(testAxis,20)
+testAxis.moveToHighLimit(10)
+time.sleep(1)
+testAxis.moveToLowLimit(10)
+time.sleep(1)
+testAxis.moveToLowLimit(-20)
 plc.close()

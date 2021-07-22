@@ -7,6 +7,6 @@ def pointMoves(axis,velocity):
         except ValueError:
             print("Not a valid position. Exiting routine...")
             break
-        axis.moveAbsolute(pos,velocity)
+        axis.moveRelative(pos,velocity)
         if axis.waitForDone() == False:
             break
